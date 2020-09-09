@@ -58,12 +58,12 @@ RUN apt-get update && \
 
 RUN a2enmod ssl
 
-RUN a2ensite default-ssl
-
 RUN cd /var/www && \
     mkdir -p /var/www/public && \
     sed -ir 's|var/www/html|var/www/public|g' /etc/apache2/sites-available/default-ssl.conf && \
     chown -R www-data. .
-    
+
+RUN a2ensite default-ssl
+
 # Configure volumes
 VOLUME /var/www
