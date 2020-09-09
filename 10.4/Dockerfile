@@ -50,25 +50,20 @@ RUN apt-get update && \
         zlib1g-dev && \
     rm -rf /var/lib/apt/lists/* /usr/src/*
 
-RUN cd /var/www/html && \
-    wget -O download.tar.gz https://get.typo3.org/10.4.7 && \
-    echo "f7ae7b45e905f2ceac93f050aa3c6c0f9070af2cf56358b6f1e8a3e0885c45bc download.tar.gz" > download.tar.gz.sum && \
-    sha256sum -c download.tar.gz.sum && \
-    tar -xzf download.tar.gz && \
-    rm download.* && \
-    ln -s typo3_src-* typo3_src && \
-    ln -s typo3_src/index.php && \
-    ln -s typo3_src/typo3 && \
-    cp typo3/sysext/install/Resources/Private/FolderStructureTemplateFiles/root-htaccess .htaccess && \
-    mkdir typo3temp && \
-    mkdir typo3conf && \
-    mkdir fileadmin && \
-    mkdir uploads && \
-    touch FIRST_INSTALL && \
-    chown -R www-data. .
+# Configure ssl self signed certs
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        ssl-cert && \
+    apt-get clean
 
+RUN a2enmod ssl
+
+RUN a2ensite default-ssl
+
+RUN cd /var/www && \
+    mkdir -p /var/www/public && \
+    sed -ir 's|var/www/html|var/www/public|g' /etc/apache2/sites-available/default-ssl.conf && \
+    chown -R www-data. .
+    
 # Configure volumes
-VOLUME /var/www/html/fileadmin
-VOLUME /var/www/html/typo3conf
-VOLUME /var/www/html/typo3temp
-VOLUME /var/www/html/uploads
+VOLUME /var/www
