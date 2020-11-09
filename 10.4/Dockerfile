@@ -56,7 +56,9 @@ RUN apt-get update && \
         ssl-cert && \
     apt-get clean
 
-RUN a2enmod ssl
+RUN a2enmod ssl && \
+    a2enmod headers && \
+    a2enmod http2
 
 RUN cd /var/www && \
     mkdir -p /var/www/public && \
